@@ -19,6 +19,7 @@ namespace REPOssessed.Menu.Tab
 
         private int i_languageIndex = -1;
         private int i_themeIndex = -1;
+        private bool settingsValuesInitialized;
 
         private string s_kbSearch = "";
 
@@ -37,10 +38,41 @@ namespace REPOssessed.Menu.Tab
 
         public override void Draw()
         {
+            if (!settingsValuesInitialized) RefreshSettingsUI();
             if (i_languageIndex == -1) i_languageIndex = Array.IndexOf(TranslationUtil.GetLanguages(), Settings.Language);
             if (i_themeIndex == -1) i_themeIndex = Array.IndexOf(ThemeUtil.GetThemes(), ThemeUtil.Name);
             MenuContent();
             KeybindContent();
+        }
+
+        private void RefreshSettingsUI()
+        {
+            i_languageIndex = Array.IndexOf(TranslationUtil.GetLanguages(), Settings.Language);
+            i_themeIndex = Array.IndexOf(ThemeUtil.GetThemes(), ThemeUtil.Name);
+            s_primaryColor = Settings.c_primary?.GetHexCode() ?? "";
+            s_menuText = Settings.c_menuText?.GetHexCode() ?? "";
+            s_espPlayer = Settings.c_espPlayer?.GetHexCode() ?? "";
+            s_espItem = Settings.c_espItem?.GetHexCode() ?? "";
+            s_espEnemy = Settings.c_espEnemy?.GetHexCode() ?? "";
+            s_espCart = Settings.c_espCart?.GetHexCode() ?? "";
+            s_espExtraction = Settings.c_espExtraction?.GetHexCode() ?? "";
+            s_espDeathHead = Settings.c_espDeathHead?.GetHexCode() ?? "";
+            s_espTruck = Settings.c_espTruck?.GetHexCode() ?? "";
+            s_lootTierColors = string.Join(",", Array.ConvertAll(Settings.c_valuableValueColors, x => x.GetHexCode()));
+            s_lootTiers = string.Join(",", Settings.i_valuableValueThresholds);
+            settingsValuesInitialized = true;
+        }
+
+        private void ResetSettings()
+        {
+            Settings.Config.RegenerateConfig();
+            RefreshSettingsUI();
+        }
+
+        private void ReloadSettings()
+        {
+            Settings.Config.LoadConfig();
+            RefreshSettingsUI();
         }
 
         private void MenuContent()
@@ -52,9 +84,9 @@ namespace REPOssessed.Menu.Tab
 
                 UI.HorizontalGroup(() =>
                 {
-                    UI.Button("SettingsTab.ResetSettings", () => Settings.Config.RegenerateConfig(), "");
+                    UI.Button("SettingsTab.ResetSettings", ResetSettings, "");
                     UI.Button("SettingsTab.SaveSettings", () => Settings.Config.SaveConfig(), "");
-                    UI.Button("SettingsTab.ReloadSettings", () => Settings.Config.LoadConfig(), "");
+                    UI.Button("SettingsTab.ReloadSettings", ReloadSettings, "");
                 });
                 UI.Button("SettingsTab.OpenSettings", () => Settings.Config.OpenConfig(), "");
 
@@ -63,6 +95,7 @@ namespace REPOssessed.Menu.Tab
                 UI.Select("SettingsTab.Theme", ref i_themeIndex, ThemeUtil.GetThemes().Select(x => new UIOption(x, () => ThemeUtil.SetTheme(x))).ToArray());
                 UI.Select("SettingsTab.Language", ref i_languageIndex, TranslationUtil.GetLanguages().Select(x => new UIOption(x, () => Settings.Language = x)).ToArray());
 
+                UI.Checkbox("SettingsTab.ShowCredits", ref Settings.b_ShowCredits);
                 UI.Checkbox("SettingsTab.FPSCounter", Cheat.Instance<FPSCounter>());
                 UI.Checkbox("SettingsTab.DebugMode", Cheat.Instance<DebugMode>());
 

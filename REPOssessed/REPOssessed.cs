@@ -98,7 +98,8 @@ namespace REPOssessed
             {
                 if (Event.current.type == EventType.Repaint)
                 {
-                    VisualUtil.DrawString(new Vector2(5f, 2f), $"REPOssessed {Settings.s_Version} By Dustin | Menu Toggle: {(Cheat.Instance<ToggleMenu>().HasKeybind ? Cheat.Instance<ToggleMenu>().keybind.ToString() : KeyCode.None.ToString())} | Unload Toggle: {(Cheat.Instance<UnloadMenu>().HasKeybind ? Cheat.Instance<UnloadMenu>().keybind.ToString() : "None")}{(Cheat.Instance<FPSCounter>().Enabled ? $" | FPS: {Cheat.Instance<FPSCounter>().FPS}" : "")}", Settings.c_primary.GetColor(), false, false, true, 14);
+                    if (Settings.b_ShowCredits)
+                        VisualUtil.DrawString(new Vector2(5f, 2f), $"REPOssessed {Settings.s_Version} By Dustin | Menu Toggle: {(Cheat.Instance<ToggleMenu>().HasKeybind ? Cheat.Instance<ToggleMenu>().keybind.ToString() : KeyCode.None.ToString())} | Unload Toggle: {(Cheat.Instance<UnloadMenu>().HasKeybind ? Cheat.Instance<UnloadMenu>().keybind.ToString() : "None")}{(Cheat.Instance<FPSCounter>().Enabled ? $" | FPS: {Cheat.Instance<FPSCounter>().FPS}" : "")}", Settings.c_primary.GetColor(), false, false, true, 14);
                     if (MenuUtil.resizing)
                     {
                         VisualUtil.DrawString(new Vector2(Screen.width / 2, 35f), TranslationUtil.Translate("SettingsTab.ResizeTitle", "SettingsTab.ResizeConfirm"), Settings.c_primary, true, true, true, 22);

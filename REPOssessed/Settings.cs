@@ -22,6 +22,7 @@ namespace REPOssessed
         public static string s_Version = "v1.0.2";
         public static string Language = "English";
         public static bool b_IsFirstLaunch = true;
+        public static bool b_ShowCredits = true;
 
         public static bool b_isMenuOpen = false;
         public static int i_menuFontSize = 14;
@@ -54,6 +55,7 @@ namespace REPOssessed
         public static bool b_DeathHeadESP = false;
         public static bool b_TruckESP = false;
 
+        public static bool b_UseExternalESP = true;
         public static bool b_useValuableTiers = false;
 
         public static bool b_DisplayMapObjects = false;
@@ -138,6 +140,7 @@ namespace REPOssessed
                 settings["MenuAlpha"] = f_menuAlpha.ToString();
 
                 cheatSettings["IsFirstLaunch"] = b_IsFirstLaunch.ToString();
+                cheatSettings["ShowCredits"] = b_ShowCredits.ToString();
                 cheatSettings["UseValuableTiers"] = b_useValuableTiers.ToString();
                 cheatSettings["PlayerESP"] = b_PlayerESP.ToString();
                 cheatSettings["EnemyESP"] = b_EnemyESP.ToString();
@@ -146,6 +149,7 @@ namespace REPOssessed
                 cheatSettings["ExtractionESP"] = b_ExtractionESP.ToString();
                 cheatSettings["DeathHeadESP"] = b_DeathHeadESP.ToString();
                 cheatSettings["TruckESP"] = b_TruckESP.ToString();
+                cheatSettings["UseExternalESP"] = b_UseExternalESP.ToString();
                 cheatSettings["DisplayMapObjects"] = b_DisplayMapObjects.ToString();
                 cheatSettings["DisplayDeathHeads"] = b_DeathHeadESP.ToString();
                 cheatSettings["DisplayPlayers"] = b_DisplayPlayers.ToString();
@@ -190,11 +194,10 @@ namespace REPOssessed
                     {
                         foreach (KeyValuePair<string, string> toggle in toggles)
                         {
-                            if (bool.TryParse(toggle.Value, out bool result) && result)
-                            {
-                                ToggleCheat? toggleCheat = Cheat.instances.OfType<ToggleCheat>().FirstOrDefault(c => c.GetType().Name == toggle.Key);
-                                if (toggleCheat != null && !toggleCheat.Enabled) toggleCheat.Toggle();
-                            }
+                            if (!bool.TryParse(toggle.Value, out bool result)) continue;
+
+                            ToggleCheat? toggleCheat = Cheat.instances.OfType<ToggleCheat>().FirstOrDefault(c => c.GetType().Name == toggle.Key);
+                            if (toggleCheat != null && toggleCheat.Enabled != result) toggleCheat.Enabled = result;
                         }
                     }
                 }
@@ -226,6 +229,8 @@ namespace REPOssessed
                     {
                         if (cheatSettings.TryGetValue("IsFirstLaunch", out JToken? isFirstLaunchToken))
                             b_IsFirstLaunch = bool.Parse(isFirstLaunchToken.ToString());
+                        if (cheatSettings.TryGetValue("ShowCredits", out JToken? showCreditsToken))
+                            b_ShowCredits = bool.Parse(showCreditsToken.ToString());
                         if (cheatSettings.TryGetValue("UseValuableTiers", out JToken? useValuableTiersToken))
                             b_useValuableTiers = bool.Parse(useValuableTiersToken.ToString());
                         if (cheatSettings.TryGetValue("PlayerESP", out JToken? playerESPToken))
@@ -242,6 +247,8 @@ namespace REPOssessed
                             b_DeathHeadESP = bool.Parse(deathHeadESPToken.ToString());
                         if (cheatSettings.TryGetValue("TruckESP", out JToken? truckESPToken))
                             b_TruckESP = bool.Parse(truckESPToken.ToString());
+                        if (cheatSettings.TryGetValue("UseExternalESP", out JToken? useExternalESPToken))
+                            b_UseExternalESP = bool.Parse(useExternalESPToken.ToString());
                         if (cheatSettings.TryGetValue("DisplayMapObjects", out JToken? displayMapObjectsToken))
                             b_DisplayMapObjects = bool.Parse(displayMapObjectsToken.ToString());
                         if (cheatSettings.TryGetValue("DisplayDeathHeads", out JToken? displayDeathHeadsToken))

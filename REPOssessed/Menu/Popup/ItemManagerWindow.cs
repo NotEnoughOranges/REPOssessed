@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using REPOssessed.Handler;
+using REPOssessed.Manager;
 using REPOssessed.Menu.Core;
 using REPOssessed.Util;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace REPOssessed.Menu.Popup
         private string search = "";
         private string amount = "1";
         private string value = "1000";
+        private bool randomValue = false;
 
         private Dictionary<GameObject, string>? Items;
 
@@ -39,34 +41,62 @@ namespace REPOssessed.Menu.Popup
                 GUILayout.BeginHorizontal();
                 UI.Textbox("General.Search", ref search, "", 50);
                 UI.Textbox("ItemManager.Amount", ref amount, @"[^0-9]", 3);
-                UI.Textbox("ItemManager.Value", ref value, @"[^0-9]", 6);
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                UI.Checkbox("ItemManager.RandomValue", ref randomValue);
+                if (!randomValue) UI.Textbox("ItemManager.Value", ref value, @"[^0-9]", 6);
                 GUILayout.EndHorizontal();
                 GUILayout.Space(20);
                 if (Items == null) Items = GameUtil.GetAllItems();
                 UI.ButtonGrid(Items.Where(i => i.Key != null && !string.IsNullOrEmpty(i.Value)).ToList(), (i) => i.Key?.GetComponent<PhysGrabObject>()?.Handle()?.GetName() ?? "Unknown", search, (i) =>
                 {
                     Transform? cameraTransform = SemiFunc.MainCamera()?.transform;
-                    if (cameraTransform == null) return;
+                    if (cameraTransform == null || !int.TryParse(amount, out int spawnAmount) || spawnAmount <= 0) return;
+                    if (!randomValue && !int.TryParse(value, out _)) return;
+
                     string path = i.Value;
                     GameObject item = i.Key;
-                    string resourcePath = ValuableDirector.instance.Reflect().GetValue<string>("resourcePath")?.Replace("/", "") ?? "";
-                    if (string.IsNullOrEmpty(resourcePath)) return;
-                    for (int j = 0; j < int.Parse(amount); j++)
+                    string resourcePath = ValuableDirector.instance?.Reflect()?.GetValue<string>("resourcePath")?.Replace("/", "") ?? "";
+                    if (string.IsNullOrEmpty(resourcePath) && !path.StartsWith("cosmetic:", System.StringComparison.Ordinal)) return;
+
+                    for (int j = 0; j < spawnAmount; j++)
                     {
                         GameObject? spawnedItem = null;
                         if (GameManager.Multiplayer())
                         {
-                            string spawnPath = path switch
-                            {
-                                "shop" => $"Items/{item.name}",
-                                "surplus" => $"{resourcePath}/{item.name}",
-                                "enemy" => $"{resourcePath}/{item.name}",
-                                _ => $"{resourcePath}/{path}/{item.name}"
-                            };
+                            string spawnPath = path.StartsWith("cosmetic:", System.StringComparison.Ordinal)
+                                ? path.Substring("cosmetic:".Length)
+                                : path switch
+                                {
+                                    "shop" => $"Items/{item.name}",
+                                    "surplus" => $"{resourcePath}/{item.name}",
+                                    "enemy" => $"{resourcePath}/{item.name}",
+                                    _ => $"{resourcePath}/{path}/{item.name}"
+                                };
                             if (!string.IsNullOrEmpty(spawnPath)) spawnedItem = PhotonNetwork.InstantiateRoomObject(spawnPath, cameraTransform.position, default);
                         }
                         else spawnedItem = Object.Instantiate(item, cameraTransform.position, default);
-                        spawnedItem?.GetComponent<PhysGrabObject>()?.Handle()?.SetValue(int.Parse(value));
+
+                        // Mark Item Manager-spawned cosmetic crates so their extraction
+                        // does not consume the game's normal level-based extraction limit.
+                        // This only works for you cause the check is done locally.
+                        if (spawnedItem?.GetComponent<CosmeticWorldObject>() is not null
+                            && spawnedItem.GetComponent<ItemManagerCosmeticWorldObject>() is null)
+                        {
+                            spawnedItem.AddComponent<ItemManagerCosmeticWorldObject>();
+                        }
+
+                        ValuableObject? valuable = spawnedItem?.GetComponent<ValuableObject>();
+                        if (valuable == null) continue;
+
+                        if (randomValue)
+                        {
+                            valuable.DollarValueSetLogic();
+                        }
+                        else
+                        {
+                            spawnedItem?.GetComponent<PhysGrabObject>()?.Handle()?.SetValue(int.Parse(value));
+                        }
                     }
                 }, 3);
             });

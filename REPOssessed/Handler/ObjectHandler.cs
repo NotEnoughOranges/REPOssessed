@@ -12,6 +12,7 @@ namespace REPOssessed.Handler
         public PhysGrabObject? physGrabObject;
         public ItemAttributes? itemAttributes;
         public ValuableObject? valuableObject;
+        public ValuableDiscoverCustom? valuableDiscoverCustom;
         public PhysGrabObjectImpactDetector? physGrabObjectImpactDetector;
         public Trap? trap;
         public EnemyRigidbody? enemyRigidbody;
@@ -22,6 +23,7 @@ namespace REPOssessed.Handler
             this.physGrabObject = physGrabObject;
             this.itemAttributes = physGrabObject?.GetComponent<ItemAttributes>();
             this.valuableObject = physGrabObject?.GetComponent<ValuableObject>();
+            this.valuableDiscoverCustom = physGrabObject?.GetComponent<ValuableDiscoverCustom>();
             this.physGrabObjectImpactDetector = physGrabObject?.GetComponent<PhysGrabObjectImpactDetector>();
             this.trap = physGrabObject?.GetComponent<Trap>();
             this.enemyRigidbody = physGrabObject?.GetComponent<EnemyRigidbody>();
@@ -31,13 +33,27 @@ namespace REPOssessed.Handler
         public string GetName()
         {
             if (IsShopItem()) return itemAttributes?.item?.itemName ?? "Unknown";
-            string name = physGrabObject?.name?.Replace("(Clone)", "").Replace("Valuable", "").Replace("Museum", "").Replace("Manor", "").Replace("Arctic", "").Replace("Wizard", "") .Trim() ?? "Unknown";
+            if (valuableDiscoverCustom != null)
+            {
+                string nameVal = physGrabObject?.name?.Replace("(Clone)", "").Trim() ?? "Unknown";
+                if (nameVal.Contains("Cosmetic World Object -"))
+                {
+                    int dashIndex = nameVal.IndexOf('-');
+                    if (dashIndex >= 0)
+                    {
+                        string rarity = nameVal[(dashIndex + 1)..].Trim();
+                        return $"Cosmetic Crate ({rarity})";
+                    }
+                }
+                return nameVal;
+            }
+            string name = physGrabObject?.name?.Replace("(Clone)", "").Replace("Valuable", "").Replace("Museum", "").Replace("Manor", "").Replace("Arctic", "").Replace("Wizard", "").Trim() ?? "Unknown";
             int dash = name.IndexOf('-');
             return dash < 0 ? name : $"{name[(dash + 1)..].Trim()} {name[..dash].Trim()}";
         }
 
         public void Break(bool effects)
-        {        
+        {
             if (!GameUtil.IsMasterClient() || IsEnemy() || IsPlayer()) return;
             if (!SemiFunc.IsMultiplayer())
             {
@@ -58,7 +74,31 @@ namespace REPOssessed.Handler
         }
         public void Teleport(Vector3 position, Quaternion rotation) => physGrabObject?.Teleport(position, rotation);
         public bool IsShopItem() => itemAttributes != null;
+        public bool IsCosmeticCrate() => valuableDiscoverCustom != null;
         public float GetValue() => valuableObject?.Reflect().GetValue<float>("dollarValueCurrent") ?? 0f;
+
+        public string GetCosmeticRarity()
+        {
+            if (!IsCosmeticCrate()) return "";
+            string name = GetName();
+            int start = name.IndexOf('(');
+            int end = name.IndexOf(')');
+            return start >= 0 && end > start ? name[(start + 1)..end].Trim() : "";
+        }
+
+        public Color GetCosmeticRarityColor()
+        {
+            string rarity = GetCosmeticRarity();
+            return rarity.ToLower() switch
+            {
+                "common" => Color.green,
+                "uncommon" => Color.blue,
+                "rare" => Color.magenta,
+                "ultra rare" => Color.yellow,
+                _ => Color.white
+            };
+        }
+
         public void SetValue(float value)
         {
             if (!GameUtil.IsMasterClient() || !IsValuable()) return;
@@ -72,12 +112,12 @@ namespace REPOssessed.Handler
         public int GetMaxBattery() => StatsManager.instance?.GetBatteryLevel(itemAttributes?.Reflect()?.GetValue<string>("instanceName")) ?? 0;
         public void ChargeBattery(int chargeAmount)
         {
-            if (!GameUtil.IsMasterClient()) return; 
+            if (!GameUtil.IsMasterClient()) return;
             itemBattery?.SetBatteryLife(chargeAmount);
         }
         public bool IsPlayer() => physGrabObject?.Handle()?.GetName()?.Contains("Player") ?? false || (physGrabObject?.Reflect()?.GetValue<bool>("isPlayer") ?? false);
         public bool IsEnemy() => enemyRigidbody != null || (physGrabObject?.Reflect()?.GetValue<bool>("isEnemy") ?? false);
-        public bool IsValuable() => physGrabObject?.Reflect().GetValue<bool>("isValuable") ?? false;
+        public bool IsValuable() => (physGrabObject?.Reflect().GetValue<bool>("isValuable") ?? false) || (valuableDiscoverCustom != null);
         public bool IsNonValuable() => physGrabObject?.Reflect().GetValue<bool>("isNonValuable") ?? false;
         public bool IsHinge() => physGrabObject?.Reflect().GetValue<bool>("hasHinge") ?? false;
         public bool IsCart() => physGrabObject?.Reflect().GetValue<bool>("isCart") ?? false;

@@ -1,4 +1,4 @@
-﻿using REPOssessed.Handler;
+using REPOssessed.Handler;
 using REPOssessed.Manager;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,6 +55,12 @@ namespace REPOssessed.Util
                 if (enemyValuableBig != null) items[enemyValuableBig] = "enemy";
             }
             StatsManager.instance?.itemDictionary?.Values?.Select(i => i?.prefab?.Prefab).Where(p => p != null).Cast<GameObject>().ToList().ForEach(p => items[p] = "shop");
+
+            // Cosmetic World Objects are configured separately from ValuablePresets.
+            ValuableDirector valuableDirector = ValuableDirector.instance;
+            valuableDirector?.cosmeticWorldObjectSetups?.Where(s => s?.prefab != null && s.prefab.IsValid() && s.prefab.Prefab != null)
+                .ToList().ForEach(s => items[s.prefab.Prefab] = $"cosmetic:{s.prefab.ResourcePath}");
+
             return items.Where(i => !string.IsNullOrEmpty(i.Value)).ToDictionary(i => i.Key, i => i.Value);
         }
 

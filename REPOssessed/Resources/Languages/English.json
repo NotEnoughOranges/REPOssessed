@@ -65,6 +65,7 @@
   "VisualTab.ESP": "ESP",
   "VisualTab.ToggleESP": "Toggle ESP",
   "VisualTab.ToggleAllESP": "Toggle All ESP",
+  "VisualTab.UseExternalESP": "External ESP Rendering",
   "VisualTab.PlayerESP": "Player ESP",
   "VisualTab.EnemyESP": "Enemy ESP",
   "VisualTab.ItemESP": "Item ESP",
