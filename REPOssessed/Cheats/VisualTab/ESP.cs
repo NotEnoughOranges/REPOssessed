@@ -77,7 +77,7 @@ namespace REPOssessed.Cheats.VisualTab
                                 new Vector3(item.ScreenX, item.ScreenY, 0),
                                 item.Text,
                                 new RGBAColor(item.ColorR, item.ColorG, item.ColorB, item.ColorA),
-                                true, true, false);
+                                true, true, false, -1, 8f);
                         }
                     }
                 }
@@ -203,7 +203,7 @@ namespace REPOssessed.Cheats.VisualTab
                 GameObjectManager.extractions.Where(e =>
                     e != null &&
                     e.Handle() is ExtractionPointHandler h &&
-                    h.IsCompleted()),
+                    !h.IsCompleted()),
                 extraction => extraction.Handle() is ExtractionPointHandler h
                     ? (h.IsShop() ? "Shop" : "Extraction")
                     : "Unknown",

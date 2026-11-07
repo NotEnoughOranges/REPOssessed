@@ -94,7 +94,7 @@ namespace REPOssessed.Util
     }
     public class VisualUtil
     {
-        public static void DrawString(Vector2 position, string label, Color color, bool centered = true, bool alignMiddle = false, bool bold = false, int fontSize = -1)
+        public static void DrawString(Vector2 position, string label, Color color, bool centered = true, bool alignMiddle = false, bool bold = false, int fontSize = -1, float verticalPadding = 0f)
         {
             Color oldColor = GUI.color;
             GUI.color = color;
@@ -103,16 +103,18 @@ namespace REPOssessed.Util
             {
                 fontSize = fontSize > 0 ? fontSize : Settings.i_menuFontSize,
                 fontStyle = bold ? FontStyle.Bold : FontStyle.Normal,
-                alignment = alignMiddle ? TextAnchor.MiddleCenter : TextAnchor.MiddleLeft
+                alignment = alignMiddle ? TextAnchor.MiddleCenter : TextAnchor.MiddleLeft,
+                clipping = verticalPadding > 0f ? TextClipping.Overflow : TextClipping.Clip
             };
             Vector2 size = style.CalcSize(content);
+            if (verticalPadding > 0f) size.y = Mathf.Max(size.y, style.CalcHeight(content, size.x)) + verticalPadding;
             GUI.Label(new Rect(centered ? position - size / 2f : position, size), content, style);
             GUI.color = oldColor;
         }
 
-        public static void DrawString(Vector2 position, string label, RGBAColor color, bool centered = true, bool alignMiddle = false, bool bold = false, int fontSize = -1)
+        public static void DrawString(Vector2 position, string label, RGBAColor color, bool centered = true, bool alignMiddle = false, bool bold = false, int fontSize = -1, float verticalPadding = 0f)
         {
-            DrawString(position, label, color.GetColor(), centered, alignMiddle, bold, fontSize);
+            DrawString(position, label, color.GetColor(), centered, alignMiddle, bold, fontSize, verticalPadding);
         }
     }
 }
