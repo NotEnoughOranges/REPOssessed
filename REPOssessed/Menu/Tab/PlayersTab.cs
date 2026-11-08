@@ -40,9 +40,9 @@ namespace REPOssessed.Menu.Tab
 
             UI.HostOnly(() => UI.Button(["PlayersTab.ReviveAll", "General.HostTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && h.IsDead()).ToList().ForEach(h => h?.RevivePlayer())));
             UI.HostOnly(() => UI.Button(["PlayersTab.ReviveOthers", "General.HostTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && h.IsDead() && !h.IsLocalPlayer()).ToList().ForEach(h => h?.RevivePlayer())));
-            UI.Button(["PlayersTab.KillAll", "General.MasterOrOwnerLocalOnlyTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null).ToList().ForEach(h => h?.Kill()));
+            UI.Button(["PlayersTab.KillAll", "General.MasterOrOwnerTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null).ToList().ForEach(h => h?.Kill()));
             UI.HostOnly(() => UI.Button(["PlayersTab.KillOthers", "General.HostTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && !h.IsLocalPlayer()).ToList().ForEach(h => h?.Kill())));
-            UI.Textbox(["PlayersTab.ChatMessageAll", "General.MasterOrOwnerLocalOnlyTag"], ref message, "", 100, new UIButton("PlayersTab.Send", () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null).ToList().ForEach(h => h?.SendMessage(message))));
+            UI.Textbox(["PlayersTab.ChatMessageAll", "General.MasterOrOwnerTag"], ref message, "", 100, new UIButton("PlayersTab.Send", () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null).ToList().ForEach(h => h?.SendMessage(message))));
             UI.HostOnly(() => UI.Textbox(["PlayersTab.ChatMessageOthers", "General.HostTag"], ref message, "", 100, new UIButton("PlayersTab.Send", () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && !h.IsLocalPlayer()).ToList().ForEach(h => h?.SendMessage(message)))));
         }
 
