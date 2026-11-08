@@ -43,6 +43,24 @@ namespace REPOssessed.Util
 
     public class UI
     {
+        // Grey out host features if not host
+        // Ignore if Single Player
+        public static void HostOnly(Action draw, bool allowWhenNotHost = false)
+        {
+            bool wasEnabled = GUI.enabled;
+            bool hasHostAuthority = !SemiFunc.IsMultiplayer() || GameUtil.IsMasterClient();
+
+            try
+            {
+                GUI.enabled = wasEnabled && (hasHostAuthority || allowWhenNotHost);
+                draw();
+            }
+            finally
+            {
+                GUI.enabled = wasEnabled;
+            }
+        }
+
         public static void Label(string header, string? label = null, bool bold = false, int fontSize = -1, bool middleAlignment = false, RGBAColor? rGBAColor = null)
         {
             HorizontalGroup(() =>
@@ -232,7 +250,7 @@ namespace REPOssessed.Util
             GUILayout.EndHorizontal();
         }
 
-        public static void ButtonGrid<T>(List<T> objects, Func<T, string> textSelector, string search, Action<T> action, int numPerRow, int width = 175)
+        public static void ButtonGrid<T>(List<T> objects, Func<T, string> textSelector, string search, Action<T> action, int numPerRow, int width = 175, bool hostOnly = false)
         {
             List<T> filtered = objects.Where(x => textSelector(x).Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
             for (int i = 0; i < filtered.Count; i += numPerRow)
@@ -241,7 +259,14 @@ namespace REPOssessed.Util
                 {
                     foreach (T obj in filtered.Skip(i).Take(numPerRow))
                     {
-                        if (GUILayout.Button(textSelector(obj), GUILayout.Width(width))) action(obj);
+                        if (hostOnly)
+                        {
+                            HostOnly(() =>
+                            {
+                                if (GUILayout.Button(textSelector(obj), GUILayout.Width(width))) action(obj);
+                            });
+                        }
+                        else if (GUILayout.Button(textSelector(obj), GUILayout.Width(width))) action(obj);
                     }
                 });
             }

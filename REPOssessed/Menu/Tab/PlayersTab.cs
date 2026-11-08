@@ -38,12 +38,12 @@ namespace REPOssessed.Menu.Tab
             if (HackMenu.Instance == null) return;
             UI.Label("PlayersTab.GeneralActions", null, true, -1, true);
 
-            UI.Button(["PlayersTab.ReviveAll", "General.HostTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && h.IsDead()).ToList().ForEach(h => h?.RevivePlayer()));
-            UI.Button(["PlayersTab.ReviveOthers", "General.HostTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && h.IsDead() && !h.IsLocalPlayer()).ToList().ForEach(h => h?.RevivePlayer()));
-            UI.Button(["PlayersTab.KillAll", "General.HostTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null).ToList().ForEach(h => h?.Kill()));
-            UI.Button(["PlayersTab.KillOthers", "General.HostTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && !h.IsLocalPlayer()).ToList().ForEach(h => h?.Kill()));
-            UI.Textbox(["PlayersTab.ChatMessageAll", "General.HostTag"], ref message, "", 100, new UIButton("PlayersTab.Send", () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null).ToList().ForEach(h => h?.SendMessage(message))));
-            UI.Textbox(["PlayersTab.ChatMessageOthers", "General.HostTag"], ref message, "", 100, new UIButton("PlayersTab.Send", () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && !h.IsLocalPlayer()).ToList().ForEach(h => h?.SendMessage(message))));
+            UI.HostOnly(() => UI.Button(["PlayersTab.ReviveAll", "General.HostTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && h.IsDead()).ToList().ForEach(h => h?.RevivePlayer())));
+            UI.HostOnly(() => UI.Button(["PlayersTab.ReviveOthers", "General.HostTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && h.IsDead() && !h.IsLocalPlayer()).ToList().ForEach(h => h?.RevivePlayer())));
+            UI.Button(["PlayersTab.KillAll", "General.MasterOrOwnerLocalOnlyTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null).ToList().ForEach(h => h?.Kill()));
+            UI.HostOnly(() => UI.Button(["PlayersTab.KillOthers", "General.HostTag"], () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && !h.IsLocalPlayer()).ToList().ForEach(h => h?.Kill())));
+            UI.Textbox(["PlayersTab.ChatMessageAll", "General.MasterOrOwnerLocalOnlyTag"], ref message, "", 100, new UIButton("PlayersTab.Send", () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null).ToList().ForEach(h => h?.SendMessage(message))));
+            UI.HostOnly(() => UI.Textbox(["PlayersTab.ChatMessageOthers", "General.HostTag"], ref message, "", 100, new UIButton("PlayersTab.Send", () => GameObjectManager.players.Select(p => p?.Handle()).Where(h => h != null && !h.IsLocalPlayer()).ToList().ForEach(h => h?.SendMessage(message)))));
         }
 
         private void PlayerActions()
@@ -64,16 +64,16 @@ namespace REPOssessed.Menu.Tab
             UI.Label("PlayersTab.IsMasterClient", selectedPlayerHandler.IsMasterClient().ToString());
             UI.Label("PlayersTab.Crowned", selectedPlayerHandler.IsCrowned().ToString());
             UI.Button("PlayersTab.OpenProfile", () => Application.OpenURL($"https://steamcommunity.com/profiles/{selectedPlayerHandler.GetSteamID()}"));
-            UI.Button("PlayersTab.Heal", () => selectedPlayerHandler.Heal(selectedPlayerHandler.GetMaxHealth()));
-            UI.Button(["PlayersTab.Crown", "General.HostTag"], () => selectedPlayerHandler.Crown());
-            UI.Button(["PlayersTab.Kill", "General.HostOrLocalTag"], () => selectedPlayerHandler.Kill());
-            UI.Button(["PlayersTab.Revive", "General.HostTag"], () => selectedPlayerHandler.RevivePlayer());
-            UI.Button("PlayersTab.ForceTumble", () => selectedPlayerHandler.ForceTumble());
-            UI.Textbox("PlayersTab.Heal", ref heal, @"[^0-9]", 3, new UIButton("General.Set", () => selectedPlayerHandler.Heal(int.Parse(heal))));
-            UI.Textbox(["PlayersTab.Damage", "General.HostOrLocalTag"], ref damage, @"[^0-9]", 3, new UIButton("General.Set", () => selectedPlayerHandler.Hurt(int.Parse(damage))));
-            UI.Button(["PlayersTab.BreakHeldObject", "General.HostTag"], () => objectHandler?.Break(false));
-            UI.Textbox(["PlayersTab.DamageHeldObject", "General.HostTag"], ref objectDamage, @"[^0-9]", 5, new UIButton("General.Set", () => objectHandler?.Damage(int.Parse(objectDamage))));
-            UI.Textbox(["PlayersTab.ChatMessage", "General.HostOrLocalTag"], ref message, "", 100, new UIButton("PlayersTab.Send", () => selectedPlayerHandler.SendMessage(message)));
+            UI.Button(["PlayersTab.Heal", "General.MasterOrOwnerTag"], () => selectedPlayerHandler.Heal(selectedPlayerHandler.GetMaxHealth()));
+            UI.HostOnly(() => UI.Button(["PlayersTab.Crown", "General.HostTag"], () => selectedPlayerHandler.Crown()));
+            UI.Button(["PlayersTab.Kill", "General.MasterOrOwnerTag"], () => selectedPlayerHandler.Kill());
+            UI.HostOnly(() => UI.Button(["PlayersTab.Revive", "General.HostTag"], () => selectedPlayerHandler.RevivePlayer()));
+            UI.Button(["PlayersTab.ForceTumble", "General.MasterOrOwnerTag"], () => selectedPlayerHandler.ForceTumble());
+            UI.Textbox(["PlayersTab.Heal", "General.MasterOrOwnerTag"], ref heal, @"[^0-9]", 3, new UIButton("General.Set", () => selectedPlayerHandler.Heal(int.Parse(heal))));
+            UI.Textbox(["PlayersTab.Damage", "General.MasterOrOwnerTag"], ref damage, @"[^0-9]", 3, new UIButton("General.Set", () => selectedPlayerHandler.Hurt(int.Parse(damage))));
+            UI.HostOnly(() => UI.Button(["PlayersTab.BreakHeldObject", "General.HostTag"], () => objectHandler?.Break(false)));
+            UI.HostOnly(() => UI.Textbox(["PlayersTab.DamageHeldObject", "General.HostTag"], ref objectDamage, @"[^0-9]", 5, new UIButton("General.Set", () => objectHandler?.Damage(int.Parse(objectDamage)))));
+            UI.Textbox(["PlayersTab.ChatMessage", "General.MasterOrOwnerTag"], ref message, "", 100, new UIButton("PlayersTab.Send", () => selectedPlayerHandler.SendMessage(message)));
             if (!selectedPlayerHandler.IsLocalPlayer())
             {
                 UI.Button("PlayersTab.TeleportToPlayer", () =>
@@ -81,11 +81,11 @@ namespace REPOssessed.Menu.Tab
                     Transform? transform = selectedPlayer.transform;
                     if (transform != null) GameObjectManager.LocalPlayer?.Handle()?.Teleport(transform.position, transform.rotation);
                 }, "SelfTab.Teleport");
-                UI.Button(["PlayersTab.TeleportPlayerToYou", "General.HostTag"], () =>
+                UI.HostOnly(() => UI.Button(["PlayersTab.TeleportPlayerToYou", "General.HostTag"], () =>
                 {
                     Transform? transform = SemiFunc.MainCamera()?.transform;
                     if (transform != null) selectedPlayerHandler.Teleport(transform.position, transform.rotation);
-                }, "SelfTab.Teleport");
+                }, "SelfTab.Teleport"));
                 UI.Button("PlayersTab.BlockRPCs", () => selectedPlayerHandler.ToggleRPCBlock(), selectedPlayerHandler.IsRPCBlocked() ? "PlayersTab.Unblock" : "PlayersTab.Block");
             }
         }

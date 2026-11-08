@@ -37,7 +37,7 @@ namespace REPOssessed.Menu.Popup
                 UI.Label("LevelManager.Level", currentLevel.NarrativeName);
                 UI.Label("LevelManager.Extractions", RoundDirector.instance.Reflect().GetValue<int>("extractionPoints").ToString());
 
-                UI.Label("LevelManager.ChangeLevel", null, true);
+                UI.Label(["LevelManager.ChangeLevel", "General.HostTag"], null, true);
 
                 if (levels == null) levels = GameUtil.GetLevels();
                 levels.Where(l => l != null && l != currentLevel).ToList().ForEach(l => UI.Button(l.NarrativeName, () =>

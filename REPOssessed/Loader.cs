@@ -26,7 +26,16 @@ namespace REPOssessed
 
         public static void LoadHarmony()
         {
-            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("REPOssessed.Resources.0Harmony.dll");
+            LoadEmbeddedAssembly("REPOssessed.Resources.Mono.Cecil.dll");
+            LoadEmbeddedAssembly("REPOssessed.Resources.MonoMod.Utils.dll");
+            LoadEmbeddedAssembly("REPOssessed.Resources.MonoMod.RuntimeDetour.dll");
+            LoadEmbeddedAssembly("REPOssessed.Resources.0Harmony.dll");
+        }
+
+        private static void LoadEmbeddedAssembly(string resourceName)
+        {
+            using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)
+                ?? throw new InvalidOperationException($"Missing embedded assembly resource: {resourceName}");
             byte[] rawAssembly = new byte[stream.Length];
             stream.Read(rawAssembly, 0, (int)stream.Length);
             AppDomain.CurrentDomain.Load(rawAssembly);

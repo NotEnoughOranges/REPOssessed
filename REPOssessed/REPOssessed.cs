@@ -37,7 +37,19 @@ namespace REPOssessed
             {
                 harmony = new Harmony("REPOssessed");
                 Harmony.DEBUG = false;
-                harmony.PatchAll(Assembly.GetExecutingAssembly());
+                foreach (Type patchType in Assembly.GetExecutingAssembly().GetTypes()
+                    .Where(type => type.GetCustomAttributes(typeof(HarmonyPatch), false).Length > 0))
+                {
+                    try
+                    {
+                        harmony.CreateClassProcessor(patchType).Patch();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"Failed to apply Harmony patches from {patchType.FullName}; continuing with remaining patch classes.");
+                        Debug.LogException(e);
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -119,7 +131,7 @@ namespace REPOssessed
         public void Unload()
         {
             StopAllCoroutines();
-            harmony?.UnpatchAll("REPOssessed");
+            harmony?.UnpatchSelf();
             if (GameUtil.IsInGame()) MenuUtil.HideCursor();
             Loader.Unload();
         }

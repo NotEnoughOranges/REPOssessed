@@ -196,7 +196,12 @@ namespace REPOssessed.Handler
         public bool IsTalking() => GetPlayerVoiceChat()?.Reflect().GetValue<bool>("isTalking") ?? false;
         public string GetName() => player.Reflect()?.GetValue<string>("playerName") ?? "Unknown";
         public PlayerVoiceChat? GetPlayerVoiceChat() => RunManager.instance?.Reflect()?.GetValue<List<PlayerVoiceChat>>("voiceChats")?.FirstOrDefault(v => v.Reflect()?.GetValue<PlayerAvatar>("playerAvatar") == player);
-        public PlayerDeathHead? GetPlayerDeathHead() => IsDead() ? playerDeathHead : null;
+        public PlayerDeathHead? GetPlayerDeathHead()
+        {
+            if (!IsDead()) return null;
+            playerDeathHead ??= player.Reflect()?.GetValue<PlayerDeathHead>("playerDeathHead");
+            return playerDeathHead;
+        }
     }
 
     public static class PlayerHandlerExtensions

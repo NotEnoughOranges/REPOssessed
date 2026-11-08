@@ -17,6 +17,10 @@
   <ItemGroup>
     <None Remove="Resources\Changelog.json" />
     <None Remove="Resources\0Harmony.dll" />
+    <None Remove="Resources\0Harmony.compat.dll" />
+    <None Remove="Resources\Mono.Cecil.dll" />
+    <None Remove="Resources\MonoMod.Utils.dll" />
+    <None Remove="Resources\MonoMod.RuntimeDetour.dll" />
     <None Remove="Resources\Newtonsoft.Json.dll" />
     <None Remove="Resources\Theme\Blue.skin" />
     <None Remove="Resources\Theme\Default.skin" />
@@ -27,7 +31,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Changelog.json" />
     <EmbeddedResource Include="Resources\Languages\English.json" />
-    <EmbeddedResource Include="Resources\0Harmony.dll" />
+    <EmbeddedResource Include="Resources\0Harmony.compat.dll" LogicalName="REPOssessed.Resources.0Harmony.dll" />
+    <EmbeddedResource Include="Resources\Mono.Cecil.dll" LogicalName="REPOssessed.Resources.Mono.Cecil.dll" />
+    <EmbeddedResource Include="Resources\MonoMod.Utils.dll" LogicalName="REPOssessed.Resources.MonoMod.Utils.dll" />
+    <EmbeddedResource Include="Resources\MonoMod.RuntimeDetour.dll" LogicalName="REPOssessed.Resources.MonoMod.RuntimeDetour.dll" />
     <EmbeddedResource Include="Resources\Newtonsoft.Json.dll" />
     <EmbeddedResource Include="Resources\Theme\Blue.skin" />
     <EmbeddedResource Include="Resources\Theme\Default.skin" />
@@ -36,7 +43,16 @@
 
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>Resources\0Harmony.dll</HintPath>
+      <HintPath>Resources\0Harmony.compat.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>Resources\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>Resources\MonoMod.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.RuntimeDetour">
+      <HintPath>Resources\MonoMod.RuntimeDetour.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>Resources\BaseGame\Assembly-CSharp.dll</HintPath>

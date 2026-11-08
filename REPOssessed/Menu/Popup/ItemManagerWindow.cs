@@ -38,6 +38,7 @@ namespace REPOssessed.Menu.Popup
                     return;
                 }
 
+                UI.Label(["ItemManager.Title", "General.HostTag"], null, true);
                 GUILayout.BeginHorizontal();
                 UI.Textbox("General.Search", ref search, "", 50);
                 UI.Textbox("ItemManager.Amount", ref amount, @"[^0-9]", 3);

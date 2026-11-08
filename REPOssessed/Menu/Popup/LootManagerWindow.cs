@@ -34,18 +34,19 @@ namespace REPOssessed.Menu.Popup
             {
                 GUILayout.BeginHorizontal();
                 UI.Textbox("General.Search", ref search, "", 50);
-                UI.Button("LootManager.TeleportAllItems", () => items?.Where(i => i != null).ToList().ForEach(p => Teleport(p)));
+                UI.HostOnly(() => UI.Button(["LootManager.TeleportAllItems", "General.HostTag"], () => items?.Where(i => i != null).ToList().ForEach(p => Teleport(p))));
                 UI.Checkbox("LootManager.IgnoreExtractionItems", ref ignoreExtractionItems);
                 UI.Checkbox("LootManager.IgnoreCartsItems", ref ignoreCartItems);
                 UI.Checkbox("LootManager.IgnoreShopItems", ref ignoreShopItems);
                 GUILayout.EndHorizontal();
                 GUILayout.Space(20);
-                UI.ButtonGrid(groupedItems.Keys.ToList(), name => name + " " + groupedItems[name].Count + "x", search, name =>
+                string masterClientTag = TranslationUtil.Translate("General.HostTag");
+                UI.ButtonGrid(groupedItems.Keys.ToList(), name => $"{name} {groupedItems[name].Count}x {masterClientTag}", search, name =>
                 {
                     List<PhysGrabObject> matchingItems = groupedItems[name];
                     if (matchingItems.Count == 0) return;
                     Teleport(matchingItems[Random.Range(0, matchingItems.Count)]);
-                }, 3);
+                }, 3, hostOnly: true);
             });
             GUI.DragWindow();
         }

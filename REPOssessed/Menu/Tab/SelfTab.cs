@@ -30,13 +30,13 @@ namespace REPOssessed.Menu.Tab
                 UI.Checkbox("SelfTab.UnlimitedEnergy", Cheat.Instance<UnlimitedStamina>());
                 UI.Checkbox("SelfTab.Godmode", Cheat.Instance<Godmode>());
                 UI.Checkbox("SelfTab.SafeGodmode", Cheat.Instance<SafeGodmode>());
-                UI.Checkbox("SelfTab.NoTumble", Cheat.Instance<NoTumble>());
+                UI.HostOnly(() => UI.Checkbox(["SelfTab.NoTumble", "General.HostTag"], Cheat.Instance<NoTumble>()), Cheat.Instance<NoTumble>().Enabled);
                 UI.Checkbox("SelfTab.InfiniteJump", Cheat.Instance<InfiniteJump>());
-                UI.Checkbox(["SelfTab.UnlimitedBattery", "General.HostTag"], Cheat.Instance<UnlimitedBattery>());
+                UI.HostOnly(() => UI.Checkbox(["SelfTab.UnlimitedBattery", "General.HostTag"], Cheat.Instance<UnlimitedBattery>()), Cheat.Instance<UnlimitedBattery>().Enabled);
                 UI.Checkbox("SelfTab.NoGunSpread", Cheat.Instance<NoGunSpread>());
                 UI.Checkbox("SelfTab.NoGunCooldown", Cheat.Instance<NoGunCooldown>());
                 UI.ToggleSlider(Cheat.Instance<GunBulletAmount>(), "SelfTab.GunBulletAmount", GunBulletAmount.Value.ToString("F1"), ref GunBulletAmount.Value, 1, 50);
-                UI.Checkbox(["SelfTab.NonEnemyTargetable", "General.HostTag"], Cheat.Instance<NonEnemyTargetable>());
+                UI.Checkbox(["SelfTab.NonEnemyTargetable", "General.MixedAuthorityTag"], Cheat.Instance<NonEnemyTargetable>());
                 UI.Checkbox("SelfTab.AlwaysShowLevel", Cheat.Instance<AlwaysShowLevel>());
                 UI.Checkbox("SelfTab.NoOverCharge", Cheat.Instance<NoOverCharge>());
                 UI.ToggleSlider(Cheat.Instance<RainbowSuit>(), "SelfTab.RainbowSuit", RainbowSuit.Value.ToString("F1"), ref RainbowSuit.Value, 0.1f, 1f);

@@ -111,19 +111,19 @@ namespace REPOssessed.Menu.Tab
         {
             UI.Label("EnemyTab.GeneralActions", null, true, -1, true);
 
-            UI.Button(["EnemyTab.KillAll", "General.HostTag"], () => GameObjectManager.enemies.Select(e => e?.Handle()).Where(h => h != null && !h.IsDead() && !h.IsDisabled()).ToList().ForEach(h => h?.Kill(noEnemyOrb)));
-            UI.Button(["EnemyTab.PermaKillAll", "General.HostTag"], () => GameObjectManager.enemies.Select(e => e?.Handle()).Where(h => h != null && !h.IsDead() && !h.IsDisabled()).ToList().ForEach(h => h?.PermaKill()));
+            UI.HostOnly(() => UI.Button(["EnemyTab.KillAll", "General.HostTag"], () => GameObjectManager.enemies.Select(e => e?.Handle()).Where(h => h != null && !h.IsDead() && !h.IsDisabled()).ToList().ForEach(h => h?.Kill(noEnemyOrb))));
+            UI.HostOnly(() => UI.Button(["EnemyTab.PermaKillAll", "General.HostTag"], () => GameObjectManager.enemies.Select(e => e?.Handle()).Where(h => h != null && !h.IsDead() && !h.IsDisabled()).ToList().ForEach(h => h?.PermaKill())));
             UI.Checkbox("EnemyTab.NoEnemyOrb", ref noEnemyOrb);
-            UI.Button(["EnemyTab.TeleportAllEnemies", "General.HostTag"], () => GameObjectManager.enemies.Select(e => e?.Handle()).Where(h => h != null && !h.IsDead() && !h.IsDisabled()).ToList().ForEach(h =>
+            UI.HostOnly(() => UI.Button(["EnemyTab.TeleportAllEnemies", "General.HostTag"], () => GameObjectManager.enemies.Select(e => e?.Handle()).Where(h => h != null && !h.IsDead() && !h.IsDisabled()).ToList().ForEach(h =>
             {
                 Transform? playerTransform = selectedPlayer?.transform;
                 if (playerTransform != null) h?.Teleport(playerTransform.position);
-            }));
-            UI.Button(["EnemyTab.LureAll", "General.HostTag"], () => GameObjectManager.enemies.Select(e => e?.Handle()).Where(h => h != null && !h.IsDead() && !h.IsDisabled()).ToList().ForEach(h =>
+            })));
+            UI.HostOnly(() => UI.Button(["EnemyTab.LureAll", "General.HostTag"], () => GameObjectManager.enemies.Select(e => e?.Handle()).Where(h => h != null && !h.IsDead() && !h.IsDisabled()).ToList().ForEach(h =>
             {
                 Transform? playerTransform = selectedPlayer?.transform;
                 if (playerTransform != null) h?.Lure(playerTransform.position);
-            }));
+            })));
             UI.Label("EnemyTab.SelectedPlayer", selectedPlayer?.Handle()?.GetName() ?? TranslationUtil.Translate("General.None"));
         }
 
@@ -140,23 +140,23 @@ namespace REPOssessed.Menu.Tab
             UI.Label("EnemyTab.Health", enemyHandler.GetHealth().ToString());
             UI.Label("EnemyTab.MaxHealth", enemyHandler.GetMaxHealth().ToString());
             UI.Label("EnemyTab.EnemyTarget", enemyHandler.GetEnemyTarget()?.Handle()?.GetName() ?? TranslationUtil.Translate("General.None"));
-            UI.Button(["EnemyTab.Kill", "General.HostTag"], () => enemyHandler.Kill(noEnemyOrb));
-            UI.Button(["EnemyTab.PermaKill", "General.HostTag"], () => enemyHandler.PermaKill());
-            UI.Button(["EnemyTab.Lure", "General.HostTag"], () =>
+            UI.HostOnly(() => UI.Button(["EnemyTab.Kill", "General.HostTag"], () => enemyHandler.Kill(noEnemyOrb)));
+            UI.HostOnly(() => UI.Button(["EnemyTab.PermaKill", "General.HostTag"], () => enemyHandler.PermaKill()));
+            UI.HostOnly(() => UI.Button(["EnemyTab.Lure", "General.HostTag"], () =>
             {
                 Transform? playerTransform = selectedPlayer?.transform;
                 if (playerTransform != null) enemyHandler.Lure(playerTransform.position);
-            });
+            }));
             UI.Button("EnemyTab.TeleportToEnemy", () => GameObjectManager.LocalPlayer?.Handle()?.Teleport(enemyTransform.position, enemyTransform.rotation));
-            UI.Button(["EnemyTab.TeleportEnemyToPlayer", "General.HostTag"], () =>
+            UI.HostOnly(() => UI.Button(["EnemyTab.TeleportEnemyToPlayer", "General.HostTag"], () =>
             {
                 Transform? playerTransform = selectedPlayer?.transform;
                 if (playerTransform != null) enemyHandler.Teleport(playerTransform.position);
-            });
-            UI.Button(["EnemyTab.TeleportPlayerToEnemy", "General.HostOrLocalTag"], () => selectedPlayer?.Handle()?.Teleport(enemyTransform.position, enemyTransform.rotation));
-            UI.Textbox(["EnemyTab.Damage", "General.HostTag"], ref damage, @"[^0-9]", 3, new UIButton("General.Set", () => enemyHandler.Hurt(int.Parse(damage))));
-            UI.Textbox(["EnemyTab.Heal", "General.HostTag"], ref heal, @"[^0-9]", 3, new UIButton("General.Set", () => enemyHandler.Heal(int.Parse(heal))));
-            UI.Textbox(["EnemyTab.Freeze", "General.HostTag"], ref freeze, @"[^0-9]", 3, new UIButton("General.Set", () => enemyHandler.Freeze(int.Parse(freeze))));
+            }));
+            UI.Button(["EnemyTab.TeleportPlayerToEnemy", "General.MasterOrOwnerTag"], () => selectedPlayer?.Handle()?.Teleport(enemyTransform.position, enemyTransform.rotation));
+            UI.HostOnly(() => UI.Textbox(["EnemyTab.Damage", "General.HostTag"], ref damage, @"[^0-9]", 3, new UIButton("General.Set", () => enemyHandler.Hurt(int.Parse(damage)))));
+            UI.HostOnly(() => UI.Textbox(["EnemyTab.Heal", "General.HostTag"], ref heal, @"[^0-9]", 3, new UIButton("General.Set", () => enemyHandler.Heal(int.Parse(heal)))));
+            UI.HostOnly(() => UI.Textbox(["EnemyTab.Freeze", "General.HostTag"], ref freeze, @"[^0-9]", 3, new UIButton("General.Set", () => enemyHandler.Freeze(int.Parse(freeze)))));
         }
 
         private void EnemySpawnerContent()
@@ -165,13 +165,13 @@ namespace REPOssessed.Menu.Tab
             EnemySetup enemySetup = enemySetups.Find(x => x.GetInstanceID() == selectedEnemySetup);
             if (enemySetup == null) return;
 
-            if (!GameUtil.IsMasterClient())
+            if (SemiFunc.IsMultiplayer() && !GameUtil.IsMasterClient())
             {
                 UI.Label("General.HostRequired", null, false, -1, false, Settings.c_error);
                 return;
             }
 
-            UI.Label("EnemyTab.EnemySpawnerContent", null, true, -1, true);
+            UI.Label(["EnemyTab.EnemySpawnerContent", "General.HostTag"], null, true, -1, true);
 
             UI.Label("EnemyTab.SelectedEnemy", enemySetup.GetName());
             UI.Textbox("EnemyTab.SpawnAmount", ref s_spawnAmount, @"[^0-9]", 3);
